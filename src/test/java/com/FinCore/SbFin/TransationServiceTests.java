@@ -6,7 +6,10 @@ import com.FinCore.SbFin.Entity.Account;
 import com.FinCore.SbFin.Entity.Transaction;
 import com.FinCore.SbFin.Entity.TransactionStatus;
 import com.FinCore.SbFin.Entity.TransactionType;
+import com.FinCore.SbFin.Exception.AccountNotFoundException;
+import com.FinCore.SbFin.Exception.InactiveAccountException;
 import com.FinCore.SbFin.Exception.InsufficientBalanceException;
+import com.FinCore.SbFin.Exception.SameAccountTransferException;
 import com.FinCore.SbFin.Repository.AccountRepository;
 import com.FinCore.SbFin.Repository.TransactionRepository;
 import com.FinCore.SbFin.Services.TransactionService;
@@ -38,7 +41,7 @@ public class TransationServiceTests {
     @InjectMocks
     private TransactionService transactionService;
 
-//    @Test
+   @Test
     void transferSuccess() {
 
         Account fromAccount = new Account();
@@ -110,13 +113,124 @@ public class TransationServiceTests {
                 () -> transactionService.transfer(dto)
         );
 
-
-
         verify(transactionRepository, never())
                 .save(any(Transaction.class)); //Mockito, check that this mock was never called in the following way.
 
 
 
     }
+
+    @Test
+    void transferToSameAccount() {
+        TransactionRequestDTO dto = new TransactionRequestDTO();
+        dto.setFromAccountId(1L);
+        dto.setToAccountId(1L);
+        dto.setAmount(BigDecimal.valueOf(2000));
+
+        SameAccountTransferException exception = assertThrows(SameAccountTransferException.class,
+                () -> transactionService.transfer(dto));
+
+        verify(transactionRepository, never()).save(any(Transaction.class));
+        verify(accountRepository, never()).findById(anyLong());
+
+    }
+
+    @Test
+    void transferAccountNotFound() {
+
+        Account fromAccount = new Account();
+        fromAccount.setId(1L);
+        fromAccount.setBalance(BigDecimal.valueOf(1000));
+        fromAccount.setStatus("Active");
+
+        TransactionRequestDTO dto = new TransactionRequestDTO();
+        dto.setFromAccountId(1L);
+        dto.setToAccountId(2L);
+        dto.setAmount(BigDecimal.valueOf(2000));
+
+        when(accountRepository.findById(1L))
+                .thenReturn(Optional.of(fromAccount));
+
+        when(accountRepository.findById(2L))
+                .thenReturn(Optional.empty());
+
+
+        assertThrows(AccountNotFoundException.class,
+                () -> transactionService.transfer(dto));
+
+        verify(transactionRepository, never()).save(any(Transaction.class));
+
+    }
+
+    @Test
+    void senderInactive(){
+
+        Account fromAccount = new Account();
+        fromAccount.setId(1L);
+        fromAccount.setBalance(BigDecimal.valueOf(1000));
+        fromAccount.setStatus(" ");
+
+        Account toAccount = new Account();
+        toAccount.setId(2L);
+        toAccount.setBalance(BigDecimal.valueOf(1000));
+        toAccount.setStatus("Active");
+
+        TransactionRequestDTO dto = new TransactionRequestDTO();
+        dto.setFromAccountId(1L);
+        dto.setToAccountId(2L);
+        dto.setAmount(BigDecimal.valueOf(2000));
+
+        when(accountRepository.findById(1L))
+                .thenReturn(Optional.of(fromAccount));
+
+        when(accountRepository.findById(2L))
+                .thenReturn(Optional.of(toAccount));
+
+
+        assertThrows(
+                InactiveAccountException.class,
+                () -> transactionService.transfer(dto)
+        );
+
+        verify(transactionRepository, never())
+                .save(any(Transaction.class));
+
+    }
+
+    @Test
+    void receiverInactive(){
+
+        Account fromAccount = new Account();
+        fromAccount.setId(1L);
+        fromAccount.setBalance(BigDecimal.valueOf(1000));
+        fromAccount.setStatus("Active");
+
+        Account toAccount = new Account();
+        toAccount.setId(2L);
+        toAccount.setBalance(BigDecimal.valueOf(1000));
+        toAccount.setStatus("");
+
+        TransactionRequestDTO dto = new TransactionRequestDTO();
+        dto.setFromAccountId(1L);
+        dto.setToAccountId(2L);
+        dto.setAmount(BigDecimal.valueOf(2000));
+
+        when(accountRepository.findById(1L))
+                .thenReturn(Optional.of(fromAccount));
+
+        when(accountRepository.findById(2L))
+                .thenReturn(Optional.of(toAccount));
+
+
+        assertThrows(
+                InactiveAccountException.class,
+                () -> transactionService.transfer(dto)
+        );
+
+        verify(transactionRepository, never())
+                .save(any(Transaction.class));
+
+    }
+
 
 }
