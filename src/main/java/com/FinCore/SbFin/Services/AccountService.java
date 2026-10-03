@@ -2,6 +2,7 @@ package com.FinCore.SbFin.Services;
 
 import com.FinCore.SbFin.Entity.Account;
 import com.FinCore.SbFin.Entity.User;
+import com.FinCore.SbFin.Exception.*;
 import com.FinCore.SbFin.Repository.AccountRepository;
 import com.FinCore.SbFin.Repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ public class AccountService {
 
     public Account CreateAccount(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
 
         Account account = new Account();
         account.setUser(user);
@@ -50,14 +51,14 @@ public class AccountService {
     public Account depositAmount(Long id, BigDecimal amount) {
 
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
         if (!account.getStatus().equals("Active")) {
-            throw new RuntimeException("Account is not active");
+            throw new InactiveAccountException("Account is not active");
         }
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Deposit amount must be greater than zero");
+            throw new AmountLessThanZeroException("Deposit amount must be greater than zero");
         }
 
         account.setBalance(account.getBalance().add(amount));
@@ -79,18 +80,18 @@ public class AccountService {
     public Account withDrawAmount(Long id, BigDecimal amount) {
 
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Account not found"));
+                .orElseThrow(() -> new AccountNotFoundException("Account not found"));
 
         if (!account.getStatus().equals("Active")) {
-            throw new RuntimeException("Account is not active");
+            throw new InactiveAccountException("Account is not active");
         }
 
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Withdrawal amount must be greater than zero");
+            throw new AmountLessThanZeroException("Withdrawal amount must be greater than zero");
         }
 
         if (account.getBalance().compareTo(amount) < 0) {
-            throw new RuntimeException("Insufficient balance");
+            throw new InsufficientBalanceException("Insufficient balance");
         }
 
         account.setBalance(account.getBalance().subtract(amount));
