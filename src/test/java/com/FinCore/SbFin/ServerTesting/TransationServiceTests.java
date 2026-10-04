@@ -1,4 +1,4 @@
-package com.FinCore.SbFin;
+package com.FinCore.SbFin.ServerTesting;
 
 import com.FinCore.SbFin.DTO.TransactionRequestDTO;
 import com.FinCore.SbFin.DTO.TransactionResponseDTO;
@@ -13,14 +13,11 @@ import com.FinCore.SbFin.Exception.SameAccountTransferException;
 import com.FinCore.SbFin.Repository.AccountRepository;
 import com.FinCore.SbFin.Repository.TransactionRepository;
 import com.FinCore.SbFin.Services.TransactionService;
-import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.Optional;

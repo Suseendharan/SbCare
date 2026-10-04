@@ -1,6 +1,9 @@
 package com.FinCore.SbFin.Services;
 
+import com.FinCore.SbFin.DTO.UserRequestDTO;
+import com.FinCore.SbFin.DTO.UserResponseDTO;
 import com.FinCore.SbFin.Entity.User;
+import com.FinCore.SbFin.Exception.UserAlreadyExists;
 import com.FinCore.SbFin.Repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,16 +19,28 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User registerUser(User user) {
+    public UserResponseDTO registerUser(UserRequestDTO dto) {
 
-        Optional<User> user1 = userRepository.findByEmail(user.getEmail());
+        Optional<User> userOptional = userRepository.findByEmail(dto.getEmail().toLowerCase());
 
-        if(user1.isPresent()) {
-            throw new RuntimeException("User with id " + user.getId() + " already exists");
+        if(userOptional.isPresent()) {
+            throw new UserAlreadyExists("User with email id:" + dto.getEmail() + " already exists");
         }
 
+        User user = new User();
+
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword().toLowerCase());
         user.setCreatedAt(LocalDateTime.now());
 
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        UserResponseDTO responseDTO = new UserResponseDTO();
+        responseDTO.setEmail(user.getEmail());
+        responseDTO.setId(user.getId());
+        responseDTO.setName(user.getName());
+
+        return responseDTO;
     }
 }

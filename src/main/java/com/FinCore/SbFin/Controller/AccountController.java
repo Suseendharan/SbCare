@@ -1,5 +1,6 @@
 package com.FinCore.SbFin.Controller;
 
+import com.FinCore.SbFin.DTO.AccountResponseDTO;
 import com.FinCore.SbFin.Entity.Account;
 import com.FinCore.SbFin.Services.AccountService;
 import org.springframework.http.HttpStatus;
@@ -18,20 +19,20 @@ public class AccountController {
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Account>  createAccount (@PathVariable Long id) {
-        Account account = accountService.CreateAccount(id);
+    public ResponseEntity<AccountResponseDTO>  createAccount (@PathVariable Long id) {
+        AccountResponseDTO account = accountService.CreateAccount(id);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/deposit")
-    public ResponseEntity<Account>  deposit(@PathVariable Long id, @RequestBody BigDecimal amount) {
-        Account account = accountService.depositAmount(id , amount);
+    public ResponseEntity<AccountResponseDTO>  deposit(@PathVariable Long id, @RequestBody BigDecimal amount) {
+        AccountResponseDTO account = accountService.depositAmount(id , amount);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 
     @PatchMapping("/{id}/withdraw")
-    public ResponseEntity<Account>  withdraw(@PathVariable Long id, @RequestBody BigDecimal amount) {
-        Account account = accountService.withDrawAmount(id , amount);
+    public ResponseEntity<AccountResponseDTO>  withdraw(@PathVariable Long id, @RequestBody BigDecimal amount) {
+        AccountResponseDTO account = accountService.withDrawAmount(id , amount);
         return new ResponseEntity<>(account, HttpStatus.OK);
     }
 }

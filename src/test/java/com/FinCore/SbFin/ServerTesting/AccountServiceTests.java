@@ -1,7 +1,7 @@
-package com.FinCore.SbFin;
+package com.FinCore.SbFin.ServerTesting;
 
+import com.FinCore.SbFin.DTO.AccountResponseDTO;
 import com.FinCore.SbFin.Entity.Account;
-import com.FinCore.SbFin.Entity.Transaction;
 import com.FinCore.SbFin.Entity.User;
 import com.FinCore.SbFin.Exception.AccountNotFoundException;
 import com.FinCore.SbFin.Exception.InactiveAccountException;
@@ -51,9 +51,9 @@ public class AccountServiceTests {
 
         when(accountRepository.save(any(Account.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        Account resultAccount = accountService.CreateAccount(1L);
+        AccountResponseDTO resultAccount = accountService.CreateAccount(1L);
 
-        assertEquals(user.getId(), resultAccount.getUser().getId());
+        assertEquals(user.getId(), resultAccount.getUserId());
 
         verify(accountRepository).save(any(Account.class));
     }

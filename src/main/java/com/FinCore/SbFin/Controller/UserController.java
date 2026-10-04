@@ -1,7 +1,12 @@
     package com.FinCore.SbFin.Controller;
 
+    import com.FinCore.SbFin.DTO.UserRequestDTO;
+    import com.FinCore.SbFin.DTO.UserResponseDTO;
     import com.FinCore.SbFin.Entity.User;
     import com.FinCore.SbFin.Services.UserService;
+    import jakarta.validation.Valid;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.http.ResponseEntity;
     import org.springframework.web.bind.annotation.*;
 
     @RestController
@@ -15,10 +20,7 @@
         }
 
         @PostMapping("/register")
-        public User regsiterUser(@RequestBody User user) {
-            System.out.println(user);
-            User newUser = userService.registerUser(user);
-
-            return newUser;
+        public ResponseEntity<UserResponseDTO> regsiterUser(@Valid @RequestBody UserRequestDTO user) {
+            return new ResponseEntity<>(userService.registerUser(user), HttpStatus.OK);
         }
     }

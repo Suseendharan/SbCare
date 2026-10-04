@@ -1,5 +1,6 @@
 package com.FinCore.SbFin.Services;
 
+import com.FinCore.SbFin.DTO.AccountResponseDTO;
 import com.FinCore.SbFin.Entity.Account;
 import com.FinCore.SbFin.Entity.User;
 import com.FinCore.SbFin.Exception.*;
@@ -22,7 +23,7 @@ public class AccountService {
         this.userRepository = userRepository;
     }
 
-    public Account CreateAccount(Long userId) {
+    public AccountResponseDTO CreateAccount(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -32,23 +33,20 @@ public class AccountService {
         account.setCreatedAt(LocalDateTime.now());
         account.setStatus("Active");
 
-        return accountRepository.save(account);
+        accountRepository.save(account);
+
+        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
+        accountResponseDTO.setId(account.getId());
+        accountResponseDTO.setBalance(account.getBalance());
+        accountResponseDTO.setCreatedAt(account.getCreatedAt());
+        accountResponseDTO.setStatus(account.getStatus());
+        accountResponseDTO.setUserId(account.getUser().getId());
+
+        return accountResponseDTO;
 
     }
 
-//    public Account depositAmount(Long id, BigDecimal amount) {
-//        Account account = accountRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Account not found"));
-//
-//        if(account.getStatus().equals("Active")) {
-//           account.setBalance(account.getBalance().add(amount));
-//        }
-//
-//        return accountRepository.save(account);
-//
-//    }
-
-    public Account depositAmount(Long id, BigDecimal amount) {
+    public AccountResponseDTO depositAmount(Long id, BigDecimal amount) {
 
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
@@ -63,21 +61,19 @@ public class AccountService {
 
         account.setBalance(account.getBalance().add(amount));
 
-        return accountRepository.save(account);
+        accountRepository.save(account);
+
+        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
+        accountResponseDTO.setId(account.getId());
+        accountResponseDTO.setBalance(account.getBalance());
+        accountResponseDTO.setCreatedAt(account.getCreatedAt());
+        accountResponseDTO.setStatus(account.getStatus());
+        accountResponseDTO.setUserId(account.getUser().getId());
+
+        return accountResponseDTO;
     }
 
-//    public Account withDrawAmount(Long id, BigDecimal amount) {
-//        Account account = accountRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("Account not found"));
-//
-//        if (account.getStatus().equals("Active")) {
-//            account.setBalance(account.getBalance().subtract(amount));
-//        }
-//        return accountRepository.save(account);
-//
-//    }
-
-    public Account withDrawAmount(Long id, BigDecimal amount) {
+    public AccountResponseDTO withDrawAmount(Long id, BigDecimal amount) {
 
         Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found"));
@@ -96,6 +92,15 @@ public class AccountService {
 
         account.setBalance(account.getBalance().subtract(amount));
 
-        return accountRepository.save(account);
+        accountRepository.save(account);
+
+        AccountResponseDTO accountResponseDTO = new AccountResponseDTO();
+        accountResponseDTO.setId(account.getId());
+        accountResponseDTO.setBalance(account.getBalance());
+        accountResponseDTO.setCreatedAt(account.getCreatedAt());
+        accountResponseDTO.setStatus(account.getStatus());
+        accountResponseDTO.setUserId(account.getUser().getId());
+
+        return accountResponseDTO;
     }
 }
