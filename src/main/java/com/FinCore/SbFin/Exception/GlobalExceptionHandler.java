@@ -103,4 +103,21 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(UserAlreadyExists.class)
+    public ResponseEntity<ErrorResponseDTO> handleUserAlreadyExists(
+            UserAlreadyExists ex) {
+
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                "CONFLICT",
+                ex.getMessage(),
+                HttpStatus.CONFLICT.value(),
+                LocalDateTime.now()
+        );
+
+        return new ResponseEntity<>(
+                errorResponse,
+                HttpStatus.CONFLICT
+        );
+    }
 }
